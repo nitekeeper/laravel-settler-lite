@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 export DEBIAN_FRONTEND=noninteractive
 
+sudo mv /home/vagrant/select-php.sh /usr/local/bin/select-php
+sudo chmod u+x /usr/local/bin/select-php
+
 ARCH=$(arch)
 
 SKIP_PHP=false
 SKIP_MYSQL=false
-DEFAULT_PHP_VERSION=8.2
+DEFAULT_PHP_VERSION=8.1
 
 echo "### Settler Build Configuration ###"
 echo "ARCH             = ${ARCH}"
@@ -238,6 +241,8 @@ else
   update-alternatives --set php /usr/bin/php$DEFAULT_PHP_VERSION
   update-alternatives --set php-config /usr/bin/php-config$DEFAULT_PHP_VERSION
   update-alternatives --set phpize /usr/bin/phpize$DEFAULT_PHP_VERSION
+  update-alternatives --set php-cgi /usr/bin/php-cgi$DEFAULT_PHP_VERSION
+  update-alternatives --set phpdbg /usr/bin/phpdbg$DEFAULT_PHP_VERSION
 
   # Install Composer
   curl -sS https://getcomposer.org/installer | php
@@ -245,7 +250,7 @@ else
   chown -R vagrant:vagrant /home/vagrant/.config
 
   # Install Global Packages
-  sudo su vagrant <<'EOF'
+  sudo su vagrant << EOF
   /usr/local/bin/composer global require "laravel/envoy=^2.0"
   /usr/local/bin/composer global require "laravel/installer=^4.0.2"
 EOF
@@ -255,7 +260,10 @@ EOF
   sed -i "s/www-data/vagrant/" /etc/apache2/envvars
 
   # Enable FPM
-  a2enconf php$DEFAULT_PHP_VERSION-fpm
+  for _version in 7.4 8.0 8.1 8.2
+  do
+    a2enconf php$_version-fpm
+  done
 
   # Assume user wants mode_rewrite support
   sudo a2enmod rewrite
@@ -291,19 +299,20 @@ EOF
   ln -sf /home/vagrant/.config/nginx/nginx.conf /etc/nginx/conf.d/nginx.conf
 
   # Setup Some PHP-FPM Options
-  sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  sed -i "s/display_errors = .*/display_errors = On/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  sed -i "s/memory_limit = .*/memory_limit = 512M/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-
-  printf "[openssl]\n" | tee -a /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  printf "openssl.cainfo = /etc/ssl/certs/ca-certificates.crt\n" | tee -a /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-
-  printf "[curl]\n" | tee -a /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
-  printf "curl.cainfo = /etc/ssl/certs/ca-certificates.crt\n" | tee -a /etc/php/$DEFAULT_PHP_VERSION/fpm/php.ini
+  for _version in 7.4 8.0 8.1 8.2
+  do
+    sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/$_version/fpm/php.ini
+    sed -i "s/display_errors = .*/display_errors = On/" /etc/php/$_version/fpm/php.ini
+    sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/$_version/fpm/php.ini
+    sed -i "s/memory_limit = .*/memory_limit = 512M/" /etc/php/$_version/fpm/php.ini
+    sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/$_version/fpm/php.ini
+    sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/$_version/fpm/php.ini
+    sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/$_version/fpm/php.ini
+    printf "[openssl]\n" | tee -a /etc/php/$_version/fpm/php.ini
+    printf "openssl.cainfo = /etc/ssl/certs/ca-certificates.crt\n" | tee -a /etc/php/$_version/fpm/php.ini
+    printf "[curl]\n" | tee -a /etc/php/$_version/fpm/php.ini
+    printf "curl.cainfo = /etc/ssl/certs/ca-certificates.crt\n" | tee -a /etc/php/$_version/fpm/php.ini
+  done
 
   # Disable XDebug On The CLI
   sudo phpdismod -s cli xdebug
@@ -311,11 +320,14 @@ EOF
   # Set The Nginx & PHP-FPM User
   sed -i "s/user www-data;/user vagrant;/" /etc/nginx/nginx.conf
   sed -i "s/# server_names_hash_bucket_size.*/server_names_hash_bucket_size 64;/" /etc/nginx/nginx.conf
-  sed -i "s/user = www-data/user = vagrant/" /etc/php/$DEFAULT_PHP_VERSION/fpm/pool.d/www.conf
-  sed -i "s/group = www-data/group = vagrant/" /etc/php/$DEFAULT_PHP_VERSION/fpm/pool.d/www.conf
-  sed -i "s/listen\.owner.*/listen.owner = vagrant/" /etc/php/$DEFAULT_PHP_VERSION/fpm/pool.d/www.conf
-  sed -i "s/listen\.group.*/listen.group = vagrant/" /etc/php/$DEFAULT_PHP_VERSION/fpm/pool.d/www.conf
-  sed -i "s/;listen\.mode.*/listen.mode = 0666/" /etc/php/$DEFAULT_PHP_VERSION/fpm/pool.d/www.conf
+  for _version in 7.4 8.0 8.1 8.2
+  do
+    sed -i "s/user = www-data/user = vagrant/" /etc/php/$_version/fpm/pool.d/www.conf
+    sed -i "s/group = www-data/group = vagrant/" /etc/php/$_version/fpm/pool.d/www.conf
+    sed -i "s/listen\.owner.*/listen.owner = vagrant/" /etc/php/$_version/fpm/pool.d/www.conf
+    sed -i "s/listen\.group.*/listen.group = vagrant/" /etc/php/$_version/fpm/pool.d/www.conf
+    sed -i "s/;listen\.mode.*/listen.mode = 0666/" /etc/php/$_version/fpm/pool.d/www.conf
+  done
   service nginx restart
   service php$DEFAULT_PHP_VERSION-fpm restart
 
@@ -464,12 +476,6 @@ echo "remove linux-source package"
 dpkg --list \
     | awk '{ print $2 }' \
     | grep linux-source \
-    | xargs apt-get -y purge;
-
-echo "remove all development packages"
-dpkg --list \
-    | awk '{ print $2 }' \
-    | grep -- '-dev\(:[a-z0-9]\+\)\?$' \
     | xargs apt-get -y purge;
 
 echo "remove docs packages"

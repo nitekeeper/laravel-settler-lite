@@ -1,13 +1,13 @@
 # NiteKeeper's Settler
 
-I've customized the original Laravel settler scripts (https://github.com/laravel/settler) for my own use.
-You can freely use these scripts to make your own Vagrant Box as well. 
+I've customized the original Laravel settler scripts (https://github.com/laravel/settler) for my own use. You can freely use these scripts to make your own Vagrant Box as well.
 
 These scripts build Vagrant box for the customized Laravel Homestead development environment, which is lighter than the original one.
 
 ## Features
 
 The features will include:
+- Ubuntu 22.04LTS
 - PHP
     * 7.4
     * 8.0
@@ -68,6 +68,7 @@ cd laravel-settler-lite
 git clone https://github.com/chef/bento
 ./bin/link-to-bento.ps1
 cd bento
+packer init -upgrade ./packer_templates
 packer build -only="vmware-iso.vm" -var-file="os_pkrvars/ubuntu/ubuntu-22.04-x86_64.pkrvars.hcl" ./packer_templates
 ```
 
@@ -92,6 +93,10 @@ cd D:\Projects\Test
 vagrant init my-custom-box
 vagrant up
 vagrant ssh
+```
+
+In the box:
+```bash
 laravel new example-site
 cd example-site
 ifconfig
@@ -100,10 +105,27 @@ ifconfig
 Get your private ip address from the result of the command `ifconfig`. The proper private IP address should look like 192.168.x.x.
 Let's say your private IP address for this box is `192.168.217.156`. Keep it some where safe and enter the following command in your terminal.
 
-```PowerShell
+```bash
 php artisan serve --host=0.0.0.0
 ```
 
 All done! Now, open your browser and type `192.168.217.156:8000`.
+
+
+## Additional Tips
+
+To change the PHP version, server type, xdebug setting, type the following commands.
+```bash
+select-php
+```
+
+When you configure `xdebug` with your client, refer to the setting values:
+```
+xdebug.mode = debug
+xdebug.discover_client_host = true
+xdebug.client_port = 9003
+xdebug.max_nesting_level = 512
+opcache.revalidate_freq = 0
+```
 
 That's it! Happy coding!
