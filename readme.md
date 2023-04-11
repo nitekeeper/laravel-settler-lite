@@ -11,8 +11,8 @@ The features will include:
 - PHP
     * 7.4
     * 8.0
-    * 8.1
-    * 8.2 (default)
+    * 8.1 (default)
+    * 8.2
 - MySQL
     * ID: homestead
     * PWD: secret
