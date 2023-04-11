@@ -39,16 +39,16 @@ If you want the full features of Laravel Homestead, you probably don't want this
 
 ## Installation
 
-*STOP*: You can download this from https://app.vagrantup.com. You do not need to create it from scratch.
+*STOP*: You can download this from https://app.vagrantup.com/nitekeeper/boxes/light-weight-homestead-vmware. You do not need to create it from scratch.
 
-Even so, if you want to create your own box, follow the instructions below. This scripts are intended to work on Windows 11. You will need to install the followings first.
+Even so, if you want to create your own box, follow the instructions below. These scripts are intended to work on Windows 11. You will need to install the followings first.
 
 *NOTE*: Ensure that your Windows 11 is up-to-date. 
 
 ### Install one of the following VMs.
 - VMWare Workstation Pro: https://www.vmware.com/content/vmware/vmware-published-sites/us/products/workstation-pro.html.html
 - VMWare Workstation Player: https://www.vmware.com/products/workstation-player.html
-    - I haven't check this version. You can try it.
+    - I haven't checked this version, but you can try it.
 - VMWare Fusion: https://www.vmware.com/products/fusion.html
 - VirtualBox: https://www.virtualbox.org
 
@@ -58,9 +58,10 @@ Even so, if you want to create your own box, follow the instructions below. This
 ### Create Vagrant Box of Your Choice
 
 If you are using VirtualBox as your choice of VM, replace `vmware-iso.vm` with `virtualbox-iso.vm` in the packer command below.
-If you want to customize the packer command, follow the normal [Packer](https://www.packer.io/) practice.
+If you want to customize the packer command, follow the normal [Packer](https://www.packer.io/) practice. Since the original
+Laravel Settler utilizes Chef/Bento source code as its base, I recommand you to check its repo as well: https://github.com/chef/bento
 
-Open your PowerShell as administrator and type the following:
+Open your PowerShell as `administrator` and type the following:
 ```PowerShell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 git clone https://github.com/nitekeeper/laravel-settler-lite
