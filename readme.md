@@ -112,6 +112,32 @@ php artisan serve --host=0.0.0.0
 
 All done! Now, open your browser and type `192.168.217.156:8000`.
 
+## How To Avoid Symbolic Link Issue on Windows 11
+
+VMWare, installed on Windows 11, has a problem with creating a symbolic link by `npm` on Ubuntu Guest OS. 
+In order to avoid this issue, install `npm` on Windows 11 and use it there, instead of using one installed 
+on Ubuntu Guest OS.
+
+`composer` sometimes runs `npm` when installing libraries as well. In order to solve this issue, you can also install 
+`composer` on Windows 11 and use it there, instead of using one installed on your Ubuntu Guest OS. To install
+`composer` on Windows 11, you will need PHP library files stored somewhere on your Windows Host system. 
+
+Please note that you do not need to install PHP. You just need its executable and extension files stored somewhere
+on your Windows OS, so that you can bypass the package installation requirements of `composer`. 
+
+You can download PHP library files from https://windows.php.net/download.
+
+- Download the zip file of the `Thread Safe` version, and 
+- unzip it to somewhere in your system. When installing `composer`, you will be asked to locate the `php.exe` file. 
+- Open `php.ini` and uncomment the followings and save it. The following extensions are frequently used by `composer`.
+```
+;extension=zip
+;extension=fileinfo
+```
+Just in case that you need other extensions to be enabled, you can simply uncomment them here as well. However, please
+note that the PHP extensions on your Windows are not actually used by your PHP application on Ubuntu Guest OS. 
+Those are just needed to bypass the `composer`'s package installation requirements.
+
 ## How To Switch Between PHP Versions
 
 To change the PHP version, server type, xdebug setting, type the following commands.
@@ -155,6 +181,5 @@ alias artisan='php artisan'
 alias serve='artisan serve --host=0.0.0.0'
 vagrant
 ```
-
 
 That's it! Happy coding!
