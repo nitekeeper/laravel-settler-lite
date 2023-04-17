@@ -112,8 +112,7 @@ php artisan serve --host=0.0.0.0
 
 All done! Now, open your browser and type `192.168.217.156:8000`.
 
-
-## Additional Tips
+## How To Switch Between PHP Versions
 
 To change the PHP version, server type, xdebug setting, type the following commands.
 ```bash
@@ -128,5 +127,34 @@ xdebug.client_port = 9003
 xdebug.max_nesting_level = 512
 opcache.revalidate_freq = 0
 ```
+
+## Additional Tips
+
+If you want some convenience while using this box, you can add followings to your `.bashrc` file.
+
+```bash
+cd ~
+nano .bashrc
+```
+
+*NOTE*: If your shared directory on your virtual machine is not `/vagrant`, change the vagrant
+shared folder address in the following `vagrant` alias setting.
+```bash
+# Git Branch Beautifier
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+export PS1="\[\033[31m\]>\[\033[37m\]>\[\033[34m\]>\[\033[00m\] \[\033[32m\]\W\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
+
+# Change the vagrant shared folder address according to your vagrant shared folder setting.
+alias vagrant='cd /vagrant && clear && ls'
+
+# Use the followings in your laravel project directory.
+alias phpunit='./vendor/bin/phpunit'
+alias artisan='php artisan'
+alias serve='artisan serve --host=0.0.0.0'
+vagrant
+```
+
 
 That's it! Happy coding!
