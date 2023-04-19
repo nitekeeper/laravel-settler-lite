@@ -138,6 +138,15 @@ Just in case that you need other extensions to be enabled, you can simply uncomm
 note that the PHP extensions on your Windows are not actually used by your PHP application on Ubuntu Guest OS. 
 Those are just needed to bypass the `composer`'s package installation requirements.
 
+In addition, you will encounter a problem when you are trying to create symbolic link between Laravel storage and Laravel public folder on Ubuntu Guest server. When you run VMWare on Windows 11, you need to create your symbolic link on your Windows Host system, not on your Ubuntu Guest system. The following instructions will help you to create the symbolic link, which you need. 
+
+- Run `cmd` as administrator.
+- Use the command `mklink` in the following format `mklink /D absolute_target_folder absolute_source_folder`. The following is an example for you.
+
+```
+mklink /D "D:\your\laravel\project\public\destination\folder" "D:\your\laravel\public\source\folder"
+```
+
 ## How To Switch Between PHP Versions
 
 To change the PHP version, server type, xdebug setting, type the following commands.
